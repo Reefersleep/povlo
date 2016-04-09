@@ -1,6 +1,6 @@
-# markovitch
+# povlo
 
-A Clojure library designed to ... well, that part is up to you.
+A naive, general implementation Markov chains. Markov? Povlo!
 
 ## Usage
 
