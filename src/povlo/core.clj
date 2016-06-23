@@ -2,53 +2,41 @@
 
 (def src ["hello" "my" "dear" "celine" "and" "hello" "dear" "charlie" "and" "you"])
 
-(defn pairs-of
+(defn- pairs-of
+  "Creates a seq of two-element seqs representing each element in the coll and its succeeding element."
   [coll]
   (concat (partition 2 coll)
           (partition 2 (rest coll))))
 
-(defn add-to
-  [m pair]
-  (let [k (first pair)
-        v (second pair)]
-    (update-in m [k] #(conj % v))))
+(defn- add-to
+  "Takes a map where each value is a coll as the first argument and a preceder/succeeder pair as the second argument and returns a map where the succeeder is added to the coll value connected to the preceder key."
+  [m [preceder succeeder]]
+  (update-in m [preceder] #(conj % succeeder)))
 
-(defn weigh
+(defn- weigh
+  "Creates a map where each element from coll is the value and all of the succeeding element occurrences are seqed together as the value."
   [coll]
   (reduce add-to {} (pairs-of coll)))
 
-(defn produce
+(defn- make-markov-adding-fn
+  "Creates an fn which utilizes the weighted map arg to select a new last element to coll."
+  [weighted-src]
+  (fn [coll]
+    (let [random-key (rand-nth (keys weighted-src))]
+      (conj coll (if (empty? coll)
+                  random-key
+                  (if-let [random-value-for-last-node (rand-nth (get weighted-src (last coll)))]
+                    random-value-for-last-node
+                    random-key))))))
+
+(defn- produce
+  "Creates a markov-generated seq of size n based on weighted-src."
   [weighted-src n]
-  (loop [w weighted-src
-         pos 0
-         acc []]
-    (if (= n pos) acc
-        (let [random-key (rand-nth (keys w))
-              new-acc (conj acc (if (= 0 pos) random-key
-                                    (if-let [random-value-for-last-node (rand-nth (get w (last acc)))]
-                                      random-value-for-last-node
-                                      random-key)))]
-          (recur w (inc pos) new-acc)))))
+  (nth (iterate (make-markov-adding-fn weighted-src)
+        [])
+       n))
 
 (defn povlo
+  "Creates a markov-generated seq of size n based on the source coll."
   [coll n]
   (produce (weigh coll) n))
-
-(defn povlo-inlined
-  [coll n]
-  (loop [w (reduce (fn add-to
-                     [m pair]
-                     (let [k (first pair)
-                           v (second pair)]
-                       (update-in m [k] #(conj % v))))
-                   {}
-                   (concat (partition 2 coll) (partition 2 (rest coll))))
-         pos 0
-         acc []]
-    (if (= n pos) acc
-        (let [random-key (rand-nth (keys w))
-              new-acc (conj acc (if (= 0 pos) random-key
-                                    (if-let [random-value-for-last-node (rand-nth (get w (last acc)))]
-                                      random-value-for-last-node
-                                      random-key)))]
-          (recur w (inc pos) new-acc)))))
