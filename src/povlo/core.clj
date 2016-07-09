@@ -2,6 +2,10 @@
 
 (def src ["hello" "my" "dear" "celine" "and" "hello" "dear" "charlie" "and" "you"])
 
+;;================================
+;;==== Markov data generation ====
+;;================================
+
 (defn- pairs-of
   "Creates a seq of two-element seqs representing each element in the coll and its succeeding element."
   [coll]
@@ -17,6 +21,11 @@
   "Creates a map where each element from coll is the value and all of the succeeding element occurrences are seqed together as the value."
   [coll]
   (reduce add-to {} (pairs-of coll)))
+ii
+
+;;===================================
+;;==== Markov product generation ====
+;;===================================
 
 (defn- make-markov-adding-fn
   "Creates an fn which utilizes the weighted map arg to select a new last element to coll."
