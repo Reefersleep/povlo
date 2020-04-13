@@ -1,10 +1,8 @@
 # povlo
 
-A naive, general implementation Markov chains. Markov? Povlo!
+A naive, general, toy implementation Markov chains. Markov? Povlo!
 
-## Usage
-
-FIXME
+Just made this for fun and to see how compact, simple and still readable an implementation of Markov chains in Clojure could be... If you don't care about memory usage :)
 
 ## License
 
